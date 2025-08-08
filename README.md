@@ -2,7 +2,7 @@
 
 This repository contains the code and data necessary to reproduce analyses and figures in the paper _"The Emergence and Cultural Persistence of Ineffective Solutions."_ All analyses are conducted using R.
 
-## 📁 Repository Structure
+## Repository Structure
 ```
 ├── code/
 │   ├── fig2.R                   # Figure 2
@@ -13,7 +13,7 @@ This repository contains the code and data necessary to reproduce analyses and f
 │   └── df_long.csv             # Main dataset used for analysis
 ```
 
-## 📦 Requirements
+## Requirements
 
 - R packages:
   - `tidyverse`
@@ -29,7 +29,7 @@ You can install the required packages with the command:
 install.packages(c("tidyverse", "lme4", "lmerTest", "sjPlot", "purrr"))
 ```
 
-## 📂 How to Reproduce
+## Usage
 
 1. **Clone the repository**:
    ```bash
@@ -47,7 +47,7 @@ install.packages(c("tidyverse", "lme4", "lmerTest", "sjPlot", "purrr"))
 
 3. Output files (e.g., figures, tables) will be saved to `figures/` folder.
 
-## 📊 Data
+## Data
 
 The dataset used in the analysis is `data/df_long.csv`
 
