@@ -2,12 +2,17 @@ library(tidyverse)
 
 df_long <- read_csv("data/df_long.csv")  
 
-df_long  %>% 
-    select(treatment_appeal, generation, period_in_chain, grid_state_flatten)
+df_cumulative <- df_long %>%
+  arrange(treatment_appeal, generation, period_in_chain) %>%
+  group_by(treatment_appeal) %>%
+  mutate(
+    n_unique = map_int(
+      period_in_chain,
+      ~ n_distinct(grid_state_flatten[period_in_chain <= .x])
+    )
+  ) %>%
+  ungroup()
 
-df_long  %>% 
-    group_by(treatment_appeal, generation, period_in_chain)  %>% 
-    summarise(n = n())
 
 
 # Add generation variable (1 for 1–6, 2 for 7–12, etc.)
