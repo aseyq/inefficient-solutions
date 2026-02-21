@@ -61,4 +61,4 @@ fig3 <- ggplot(df_cumulative, aes(x = period_in_chain, y = n_unique, color = tre
   )
 
 # Save plot
-ggsave("figures/fig3.png", plot = fig3, width = 6, height = 5)
+ggsave("figures/fig3.png", plot = fig3, width = 6, height = 5, dpi = 300)
