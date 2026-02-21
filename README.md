@@ -46,18 +46,7 @@ You can install the required packages with the command:
 install.packages(c("tidyverse", "lme4", "lmerTest", "sjPlot", "purrr"))
 ```
 
-Install Python dependencies with:
-
-```bash
-pip install -r requirements.txt
-```
-
-Notes for the semantic script (optional):
-- `code/zzz_optional_figA7_calclulate_semantic.py` uses the public model `all-MiniLM-L6-v2`.
-- No Hugging Face account is required.
-- Requires download of the model the first time, which may take a few minutes.
-
-## Usage
+## Steps to Reproduce Analyses and Figures
 
 1. **Clone the repository**:
    ```bash
@@ -108,8 +97,14 @@ Notes for the semantic script (optional):
 
    This recreates files in `data/processed/` that are required by `code/figA7.R`.
 
+
+Notes for the semantic script (optional):
+- `code/zzz_optional_figA7_calclulate_semantic.py` uses the public model `all-MiniLM-L6-v2`.
+- No Hugging Face account is required and analysis is free of cost.
+- Requires download of the model the first time, which may take a few minutes.
+
 **(optional - To regenerate GPT-based coding of advice and comparison with manual coding).**
-Please note that for this replication, we are including the GPT-based coding of advice messages for comparison with manual coding, and this will cost some API credits. Please make sure that you are aware of the costs associated with using the OpenAI API before running this part of the code.
+Please note that for this replication, we are including the GPT-based coding of advice messages for comparison with manual coding, and this will cost some API credits. **Please make sure that you are aware of the costs associated with using the OpenAI API before running this part of the code.**
 
 1. **Set up OpenAI API key**:
 
