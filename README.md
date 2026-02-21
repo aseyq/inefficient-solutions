@@ -1,6 +1,6 @@
 # The Emergence and Cultural Persistence of Ineffective Solutions
 
-This repository contains the code and data necessary to reproduce analyses and figures in the paper _"The Emergence and Cultural Persistence of Ineffective Solutions."_ All analyses are conducted using R.
+This repository contains the code and data necessary to reproduce analyses and figures in the paper _"The Emergence and Cultural Persistence of Ineffective Solutions."_ (Saral, Singh, Jacquet, Jang & Derex, 202X). 
 
 ## Repository Structure
 | Path | Type | Description |
@@ -25,18 +25,18 @@ This repository contains the code and data necessary to reproduce analyses and f
 
 ## Requirements
 
-- R packages (installed in current environment):
-   - `tidyverse==2.0.0`
-   - `lme4==1.1.36`
-   - `lmerTest==3.1.3`
-   - `sjPlot==2.9.0`
-   - `purrr==1.0.2`
+- R packages:
+   - `tidyverse` (2.0.0)
+   - `lme4` (1.1.36)
+   - `lmerTest` (3.1.3)
+   - `sjPlot` (2.9.0)
+   - `purrr` (1.0.2)
 
-- Python packages (from `requirements.txt`):
-   - `numpy==2.4.2`
-   - `openai==2.21.0`
-   - `pandas==3.0.1`
-   - `sentence-transformers==5.2.3`
+- Python packages (see `requirements.txt`):
+   - `numpy` (2.4.2)
+   - `openai` (2.21.0)
+   - `pandas` (3.0.1)
+   - `sentence-transformers` (5.2.3)
 
 
 You can install the required packages with the command:
