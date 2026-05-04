@@ -219,3 +219,6 @@ marimo/_static/
 marimo/_lsp/
 __marimo__/
 .DS_Store
+figures/~$stance_measure.docx
+figures/distance_measure.docx
+manuscript.pdf
