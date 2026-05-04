@@ -4,24 +4,6 @@ source("code/_helpers.R")
 
 base_theme <- make_base_theme()
 
-# Cache parsed solution vectors so repeated strings are converted only once.
-solution_cache <- new.env(parent = emptyenv())
-
-solution_vector <- function(solution) {
-  if (is.na(solution) || solution == "") {
-    return(rep(NA_integer_, 27))
-  }
-  # Reuse cached vector when this solution string has already been parsed.
-  if (exists(solution, envir = solution_cache, inherits = FALSE)) {
-    return(get(solution, envir = solution_cache, inherits = FALSE))
-  }
-  tokens <- strsplit(solution, "-", fixed = TRUE)[[1]]
-  vec <- as.integer(strsplit(paste(tokens, collapse = ""), "", fixed = TRUE)[[1]])
-  # Store parsed vector in cache for future lookups.
-  assign(solution, vec, envir = solution_cache)
-  vec
-}
-
 compute_chain_diversity <- function(group_df) {
   mat <- do.call(rbind, lapply(group_df$transmitted_solution, solution_vector))
   dist_mat <- as.matrix(dist(mat, method = "manhattan", diag = TRUE, upper = TRUE))
@@ -121,15 +103,17 @@ FigA5A <- ggplot(
     group = treatment_appeal
   )
 ) +
-  geom_point(size = 2.8) +
   geom_line(linewidth = 0.6) +
-  geom_linerange(
+  geom_errorbar(
     aes(
       ymin = within_chain_diversity_mean - within_chain_diversity_se,
-      ymax = within_chain_diversity_mean + within_chain_diversity_se
+      ymax = within_chain_diversity_mean + within_chain_diversity_se,
+      color = I(treatment_colors_dark[treatment_appeal])
     ),
-    linewidth = 0.4
+    width = 0.2,
+    linewidth = 0.7
   ) +
+  geom_point(size = 2.8) +
   scale_color_manual(values = treatment_colors, labels = treatment_names) +
   scale_x_continuous(breaks = sort(unique(cultural_convergence_summary$generation))) +
   scale_y_continuous(
@@ -153,15 +137,17 @@ FigA5B <- ggplot(
     group = treatment_appeal
   )
 ) +
-  geom_point(size = 2.8) +
   geom_line(linewidth = 0.6) +
-  geom_linerange(
+  geom_errorbar(
     aes(
       ymin = between_chain_diversity_mean - between_chain_diversity_se,
-      ymax = between_chain_diversity_mean + between_chain_diversity_se
+      ymax = between_chain_diversity_mean + between_chain_diversity_se,
+      color = I(treatment_colors_dark[treatment_appeal])
     ),
-    linewidth = 0.4
+    width = 0.2,
+    linewidth = 0.7
   ) +
+  geom_point(size = 2.8) +
   scale_color_manual(values = treatment_colors, labels = treatment_names) +
   scale_x_continuous(breaks = sort(unique(cultural_convergence_summary$generation))) +
   scale_y_continuous(

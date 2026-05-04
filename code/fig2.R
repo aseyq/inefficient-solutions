@@ -26,8 +26,10 @@ Fig2A <- df_long_feedbacks %>%
   mutate(se = sd / sqrt(n)) %>%
   ggplot(aes(x = generation, y = mean, color = treatment_appeal, group = interaction(treatment_appeal, generation))) +
   geom_line(aes(group = treatment_appeal), linewidth = 0.5) +
+  geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = I(treatment_colors_dark[treatment_appeal])),
+    width = 0.2, linewidth = 0.7
+  ) +
   geom_point(size = 4) +
-  geom_linerange(aes(ymin = mean - se, ymax = mean + se, linewidth = 0.01), alpha = 0.5) +
   scale_color_manual(labels = treatment_names, values = treatment_colors) +
   ylim(600, 750) +
   labs(x = "Generation", y = "Score of transmitted solutions") +
@@ -38,9 +40,7 @@ Fig2A <- df_long_feedbacks %>%
     axis.text = element_text(size = 14),
     legend.text = element_text(size = 12)
   ) +
-  theme(legend.position = "top") +
-  scale_linewidth(range = c(0.2, 1)) +
-  scale_size_identity()
+  theme(legend.position = "top")
 
 ###############################
 
@@ -56,9 +56,11 @@ Fig2B <- df_long_feedbacks %>%
   mutate(se = sd / sqrt(n)) %>%
   ggplot(aes(x = generation, y = mean, color = treatment_appeal, group = interaction(treatment_appeal, generation))) +
   geom_hline(yintercept = 98, linetype = "dotted", color = "black", linewidth = 0.5, alpha = .5) +
-  geom_point(size = 4) +
-  geom_linerange(aes(ymin = mean - se, ymax = mean + se, linewidth = 0.01)) +
   geom_line(aes(group = treatment_appeal), linewidth = 0.5) +
+  geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color = I(treatment_colors_dark[treatment_appeal])),
+    width = 0.2, linewidth = 0.7
+  ) +
+  geom_point(size = 4) +
   scale_color_manual(labels = treatment_names, values = treatment_colors) +
   ylim(0, 100) +
   labs(x = "Generation", y = "Cost of transmitted solutions") +
@@ -69,11 +71,7 @@ Fig2B <- df_long_feedbacks %>%
     axis.text = element_text(size = 14),
     legend.text = element_text(size = 12)
   ) +
-  theme(legend.position = "top") +
-  scale_linewidth(range = c(0.2, 1)) +
-  scale_size_identity()
-
-
+  theme(legend.position = "top")
 
 # Figure 2
 wrap_plots(Fig2A, Fig2B) +

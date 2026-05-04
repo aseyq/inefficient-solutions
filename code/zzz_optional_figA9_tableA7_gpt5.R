@@ -15,7 +15,7 @@ df_long <- read_csv("data/df_long.csv") %>%
     ) %>%
     filter(treatment_appeal == "high_appeal")
 
-df_advice <- read_csv("data/df_advice_manual_coding.csv", show_col_types = FALSE)
+df_advice <- read_csv("data/df_advice_gpt5.csv", show_col_types = FALSE)
 
 df_advice_categories <- df_advice %>%
     select(participant_code, mix_and_match:other) %>%
@@ -69,11 +69,6 @@ group_colors <- c(
     "Mix & Match" = "#B5179E"
 )
 
-group_colors_dark <- c(
-    "All others" = "#1A1A1B",
-    "Mix & Match" = "#7A0F6A"
-)
-
 FigA9A <- ggplot(
     mix_treatment_summary,
     aes(
@@ -86,11 +81,11 @@ FigA9A <- ggplot(
     geom_errorbar(
         aes(
             ymin = within_distance_mean - within_distance_se,
-            ymax = within_distance_mean + within_distance_se,
-            color = I(group_colors_dark[selected_mix_and_match_group])
+            ymax = within_distance_mean + within_distance_se
         ),
-        width = 0.2,
-        linewidth = 0.7
+        width = 0.15,
+        linewidth = 0.4,
+        color = "black"
     ) +
     scale_color_manual(values = group_colors) +
     scale_fill_manual(values = group_colors) +
@@ -115,17 +110,15 @@ FigA9B <- ggplot(
         group = selected_mix_and_match_group
     )
 ) +
+    geom_point(size = 2.8) +
     geom_line(linewidth = 0.6) +
-    geom_errorbar(
+    geom_linerange(
         aes(
             ymin = within_distance_mean - within_distance_se,
-            ymax = within_distance_mean + within_distance_se,
-            color = I(group_colors_dark[selected_mix_and_match_group])
+            ymax = within_distance_mean + within_distance_se
         ),
-        width = 0.2,
-        linewidth = 0.7
+        linewidth = 0.4
     ) +
-    geom_point(size = 2.8) +
     scale_color_manual(values = group_colors) +
     scale_x_continuous(breaks = sort(unique(mix_generation_summary$generation))) +
     scale_y_continuous(
@@ -146,26 +139,26 @@ FigA9 <- (FigA9A + FigA9B) +
     theme(legend.position = "none")
 
 ggsave(
-    "figures/figA9.png",
+    "figures/figA9_gpt5.png",
     FigA9,
     width = 10.2,
     height = 4.6,
     dpi = 300
 )
 
-model_tableA6_mix <- lmer(
+model_tableA7_mix <- lmer(
     within_individual_solution_distance ~ selected_mix_and_match + (1 | chain_code),
     data = participant_metrics,
     REML = FALSE
 )
 
-model_tableA6_mix_additive <- lmer(
+model_tableA7_mix_additive <- lmer(
     within_individual_solution_distance ~ selected_mix_and_match + generation + (1 | chain_code),
     data = participant_metrics,
     REML = FALSE
 )
 
-model_tableA6_mix_interaction <- lmer(
+model_tableA7_mix_interaction <- lmer(
     within_individual_solution_distance ~ selected_mix_and_match * generation + (1 | chain_code),
     data = participant_metrics,
     REML = FALSE
@@ -173,14 +166,15 @@ model_tableA6_mix_interaction <- lmer(
 
 print(
     tab_model(
-        model_tableA6_mix,
-        model_tableA6_mix_additive,
-        model_tableA6_mix_interaction,
+        model_tableA7_mix,
+        model_tableA7_mix_additive,
+        model_tableA7_mix_interaction,
         show.ci = FALSE,
         show.se = TRUE,
         show.re.var = FALSE,
         dv.labels = c("Mix & Match", "Mix & Match + generation", "Mix & Match × generation"),
-        title = "Table A6) High-appeal: within-individual distance by selecting Mix & Match advice",
-        file = "figures/table_a6_manual.html"
+        title = "Table A7) High-appeal: within-individual distance by selecting Mix & Match advice",
+        file = "figures/table_a7_gpt5.html"
     )
 )
+message("Error bar on Fig A9 GPT5 comparison gets out of the fixed range. I am keeping it to compare it with the original Fig9 that we put in the paper. Can update range for both before publication.")

@@ -1,211 +1,119 @@
 library(tidyverse)
+library(jsonlite)
 library(patchwork)
 source("code/_helpers.R")
 
-base_theme <- make_base_theme()
+# -- Data ----------------------------------------------------------------------
+df_long   <- read_csv("data/df_long.csv",                 show_col_types = FALSE)
+df_advice <- read_csv("data/df_advice_manual_coding.csv", show_col_types = FALSE)
 
-df_long <- read_csv("data/df_long.csv") %>%
-  mutate(
-    generation = as.integer(generation),
-    period = as.integer(period),
-    net_payoff = 72 + 80 * plants_treated - cost,
-    treatment_appeal = factor(treatment_appeal, levels = c("low_appeal", "high_appeal")),
-    chain_code = as.character(chain_code)
-  )
-
-chain_order <- df_long %>%
-  distinct(treatment_appeal, chain_code) %>%
-  mutate(
-    chain_facet = paste0(
-      if_else(treatment_appeal == "low_appeal", "Low", "High"),
-      " appeal · Chain ",
-      chain_code
+# -- Transmitted solutions (period 6) with nutrient counts --------------------
+df_trans <- df_long %>%
+    filter(period == 6) %>%
+    select(participant_code, treatment_appeal, generation, chain_code, grid_state, plants_treated) %>%
+    mutate(tmp = map(grid_state, parse_grid_safe)) %>%
+    unnest_wider(tmp) %>%
+    mutate(
+        is_optimal   = n_blue == 9 & n_yellow == 0 & n_red == 0 & plants_treated == 9,
+        is_only_blue = n_blue > 0  & n_yellow == 0 & n_red == 0 & !is_optimal,
+        is_blue_pred = n_blue > (n_yellow + n_red) & !is_optimal & !(n_blue > 0 & n_yellow == 0 & n_red == 0)
     )
-  )
 
-df_chain_scores <- df_long %>%
-  filter(period == 6) %>%
-  left_join(chain_order, by = c("treatment_appeal", "chain_code")) %>%
-  mutate(chain_facet = as.character(chain_facet))
+# -- Chain numbering: sorted by blue status at gen 4, then 3, then 2, then 1 --
+chain_status_by_gen <- df_trans %>%
+    mutate(
+        gen_status = case_when(
+            is_optimal   ~ 1L,
+            is_only_blue ~ 2L,
+            is_blue_pred ~ 3L,
+            TRUE         ~ 4L
+        )
+    ) %>%
+    group_by(treatment_appeal, chain_code, generation) %>%
+    summarise(gen_status = min(gen_status, na.rm = TRUE), .groups = "drop") %>%
+    pivot_wider(names_from = generation, values_from = gen_status,
+                names_prefix = "gen", values_fill = 4L)
 
-chain_slopes <- df_chain_scores %>%
-  group_by(treatment_appeal, chain_code, chain_facet) %>%
-  summarise(
-    slope = coef(lm(net_payoff ~ generation))[2],
-    .groups = "drop"
-  ) %>%
-  arrange(treatment_appeal, desc(slope), chain_code) %>%
-  mutate(
-    chain_no = row_number(),
-    chain_label = paste0("Chain ", chain_no)
-  )
+chain_nums <- chain_status_by_gen %>%
+    arrange(treatment_appeal == "low_appeal", gen1, gen2, gen3, gen4, chain_code) %>%
+    mutate(chain_num = row_number())
 
-chain_label_map <- setNames(chain_slopes$chain_label, chain_slopes$chain_facet)
-chain_no_labeller <- as_labeller(chain_label_map)
+# -- Favor Blue advice flag per chain - generation ----------------------------
+advice_flags <- df_advice %>%
+    group_by(chain_code, generation) %>%
+    summarise(has_favor_blue = any(blue_prioritize == 1, na.rm = TRUE), .groups = "drop")
 
-df_chain_scores <- df_chain_scores %>%
-  left_join(
-    chain_slopes %>% select(treatment_appeal, chain_code, chain_no, chain_label),
-    by = c("treatment_appeal", "chain_code")
-  ) %>%
-  mutate(
-    chain_facet = factor(chain_facet, levels = chain_slopes$chain_facet)
-  )
+# -- Panel A: stacked bar chart - blue solution categories -------------------
+bar_counts <- df_trans %>%
+    group_by(treatment_appeal, generation) %>%
+    summarise(
+        `Optimal solution` = sum(is_optimal,   na.rm = TRUE),
+        `Only blue`        = sum(is_only_blue, na.rm = TRUE),
+        `Blue predominant` = sum(is_blue_pred, na.rm = TRUE),
+        .groups = "drop"
+    ) %>%
+    pivot_longer(c(`Optimal solution`, `Only blue`, `Blue predominant`), names_to = "type", values_to = "n") %>%
+    mutate(type = factor(type, levels = c("Blue predominant", "Only blue", "Optimal solution")))
 
-chain_generation_average <- df_chain_scores %>%
-  group_by(treatment_appeal, chain_facet, generation) %>%
-  summarise(mean_score = mean(net_payoff, na.rm = TRUE), .groups = "drop")
+FigA10 <- ggplot(bar_counts, aes(x = factor(generation), y = n, fill = type)) +
+    geom_col(position = "stack", width = 0.7) +
+    facet_wrap(~treatment_appeal, labeller = as_labeller(treatment_names)) +
+    scale_fill_manual(values = c("Optimal solution" = "#08306b", "Only blue" = "#1a6faf", "Blue predominant" = "#74b9d4")) +
+    scale_y_continuous(breaks = seq(0, 30, by = 5), limits = c(0, 30), expand = expansion(mult = c(0, 0.02))) +
+    labs(x = "Generation", y = "Number of solutions", fill = NULL) +
+    make_base_theme() + theme_bw() +
+    theme(legend.position = "top", panel.grid = element_blank())
 
-plot_score_treatment <- function(treatment_value) {
-  data_t <- df_chain_scores %>%
-    filter(treatment_appeal == treatment_value)
+# -- Panel B: tile plot - blue status per chain - generation ------------------
+tile_data <- df_trans %>%
+    group_by(chain_code, treatment_appeal, generation) %>%
+    summarise(
+        optimal   = any(is_optimal,   na.rm = TRUE),
+        only_blue = any(is_only_blue, na.rm = TRUE),
+        pred_blue = any(is_blue_pred, na.rm = TRUE),
+        .groups = "drop"
+    ) %>%
+    left_join(chain_nums,   by = c("treatment_appeal", "chain_code")) %>%
+    left_join(advice_flags, by = c("chain_code", "generation")) %>%
+    mutate(
+        blue_status = case_when(
+            optimal   ~ "Optimal solution",
+            only_blue ~ "Only blue",
+            pred_blue ~ "Predominantly blue",
+            TRUE      ~ "Neither"
+        ),
+        blue_status = factor(blue_status, levels = c("Optimal solution", "Only blue", "Predominantly blue", "Neither")),
+        chain_label = factor(
+            paste("Chain", chain_num),
+            levels = paste("Chain", sort(unique(chain_num), decreasing = TRUE))
+        )
+    )
 
-  avg_t <- chain_generation_average %>%
-    filter(treatment_appeal == treatment_value)
-
-  ggplot(
-    data_t,
-    aes(x = generation, y = net_payoff, color = treatment_appeal)
-  ) +
+FigA10_tile <- ggplot(tile_data, aes(x = factor(generation), y = chain_label, fill = blue_status)) +
+    geom_tile(color = "white", linewidth = 0.4) +
     geom_point(
-      size = 1.9,
-      alpha = 0.8
+        data  = ~ filter(.x, has_favor_blue),
+        aes(color = "Favor Blue advice"),
+        size = 1.5, shape = 16
     ) +
-    geom_line(
-      data = avg_t,
-      aes(x = generation, y = mean_score, group = chain_facet),
-      inherit.aes = FALSE,
-      color = "#2E7D32",
-      linewidth = 1.0,
-      alpha = 0.95
-    ) +
-    facet_wrap(
-      ~chain_facet,
-      ncol = 10,
-      labeller = chain_no_labeller
+    facet_wrap(~treatment_appeal, labeller = as_labeller(treatment_names), scales = "free_y", nrow = 1) +
+    scale_fill_manual(
+        values = c("Optimal solution" = "#08306b", "Only blue" = "#1a6faf", "Predominantly blue" = "#74b9d4", "Neither" = "#e8e8e8"),
+        breaks = c("Optimal solution", "Only blue", "Predominantly blue")
     ) +
     scale_color_manual(
-      values = treatment_colors,
-      breaks = c("low_appeal", "high_appeal"),
-      labels = treatment_names[c("low_appeal", "high_appeal")]
+        values = c("Favor Blue advice" = "#00aaff"),
+        name   = NULL,
+        guide  = guide_legend(override.aes = list(size = 2))
     ) +
-    scale_x_continuous(breaks = sort(unique(df_chain_scores$generation))) +
-    labs(
-      title = treatment_names[[treatment_value]],
-      x = "Generation",
-      y = "Score of transmitted solutions",
-      color = NULL
-    ) +
-    theme_bw() +
-    theme(
-      strip.text = element_text(size = 9),
-      strip.background = element_blank(),
-      plot.title = element_text(size = 12, face = "bold")
-    )
-}
+    guides(fill = guide_legend(override.aes = list(shape = NA))) +
+    labs(x = "Generation", y = "Chain", fill = NULL) +
+    make_base_theme() + theme_bw() +
+    theme(legend.position = "top", axis.text.y = element_text(size = 7), panel.grid = element_blank())
 
-FigA10a <- (plot_score_treatment("low_appeal") / plot_score_treatment("high_appeal")) +
-  plot_layout(guides = "collect") &
-  theme(legend.position = "none")
+# -- Combine and save ----------------------------------------------------------
+combined_a10 <- (FigA10 / FigA10_tile) +
+    plot_layout(heights = c(1, 1.6)) +
+    plot_annotation(tag_levels = "A")
 
-# ggsave(
-#   "figures/figA10a.png",
-#   FigA10a,
-#   width = 14,
-#   height = 9,
-#   dpi = 300
-# )
-
-df_chain_cost <- df_long %>%
-  filter(period == 6) %>%
-  left_join(chain_order, by = c("treatment_appeal", "chain_code")) %>%
-  mutate(chain_facet = as.character(chain_facet))
-
-df_chain_cost <- df_chain_cost %>%
-  left_join(
-    chain_slopes %>% select(treatment_appeal, chain_code, chain_no, chain_label),
-    by = c("treatment_appeal", "chain_code")
-  ) %>%
-  mutate(
-    chain_facet = factor(chain_facet, levels = chain_slopes$chain_facet)
-  )
-
-chain_generation_average_cost <- df_chain_cost %>%
-  group_by(treatment_appeal, chain_facet, generation) %>%
-  summarise(mean_cost = mean(cost, na.rm = TRUE), .groups = "drop")
-
-plot_cost_treatment <- function(treatment_value) {
-  data_t <- df_chain_cost %>%
-    filter(treatment_appeal == treatment_value)
-
-  avg_t <- chain_generation_average_cost %>%
-    filter(treatment_appeal == treatment_value)
-
-  ggplot(
-    data_t,
-    aes(x = generation, y = cost, color = treatment_appeal)
-  ) +
-    geom_point(
-      size = 1.9,
-      alpha = 0.8
-    ) +
-    geom_line(
-      data = avg_t,
-      aes(x = generation, y = mean_cost, group = chain_facet),
-      inherit.aes = FALSE,
-      color = "#C62828",
-      linewidth = 1.0,
-      alpha = 0.95
-    ) +
-    facet_wrap(
-      ~chain_facet,
-      ncol = 10,
-      labeller = chain_no_labeller
-    ) +
-    scale_color_manual(
-      values = treatment_colors,
-      breaks = c("low_appeal", "high_appeal"),
-      labels = treatment_names[c("low_appeal", "high_appeal")]
-    ) +
-    scale_x_continuous(breaks = sort(unique(df_chain_cost$generation))) +
-    labs(
-      title = treatment_names[[treatment_value]],
-      x = "Generation",
-      y = "Cost of transmitted solutions",
-      color = NULL
-    ) +
-    theme_bw() +
-    theme(
-      strip.text = element_text(size = 9),
-      strip.background = element_blank(),
-      plot.title = element_text(size = 12, face = "bold")
-    )
-}
-
-FigA10b <- (plot_cost_treatment("low_appeal") / plot_cost_treatment("high_appeal")) +
-  plot_layout(guides = "collect") &
-  theme(legend.position = "none")
-
-# ggsave(
-#   "figures/figA10b.png",
-#   FigA10b,
-#   width = 14,
-#   height = 9,
-#   dpi = 300
-# )
-
-# Combined figure
-FigA10 <- wrap_plots(
-  wrap_elements(FigA10a),
-  wrap_elements(FigA10b),
-  ncol = 1
-) +
-  plot_annotation(tag_levels = "A")
-
-ggsave(
-  "figures/figA10.png",
-  FigA10,
-  width = 12,
-  height = 15,
-  dpi = 300
-)
+ggsave("figures/figA10.png", combined_a10, width = 8.5, height = 9, dpi = 300)

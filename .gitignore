@@ -1,3 +1,11 @@
+## Data from other experiment added for comparison.
+data/df_long_nopay.csv
+figA12.R
+figA13.R
+tableA8.R
+
+*.txt
+zzz_temp*
 Rplots.pdf
 .vscode/
 # Byte-compiled / optimized / DLL files

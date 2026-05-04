@@ -62,11 +62,11 @@ FigA6A <- ggplot(
   geom_errorbar(
     aes(
       ymin = mean_feedback_length - se_feedback_length,
-      ymax = mean_feedback_length + se_feedback_length
+      ymax = mean_feedback_length + se_feedback_length,
+      color = I(treatment_colors_dark[treatment_appeal])
     ),
-    width = 0.15,
-    linewidth = 0.4,
-    color = "black"
+    width = 0.2,
+    linewidth = 0.7
   ) +
   scale_color_manual(values = treatment_colors, labels = treatment_names) +
   scale_fill_manual(values = treatment_colors, labels = treatment_names) +
@@ -92,15 +92,17 @@ FigA6B <- ggplot(
     group = treatment_appeal
   )
 ) +
-  geom_point(size = 2.8) +
   geom_line(linewidth = 0.6) +
-  geom_linerange(
+  geom_errorbar(
     aes(
       ymin = mean_feedback_length - se_feedback_length,
-      ymax = mean_feedback_length + se_feedback_length
+      ymax = mean_feedback_length + se_feedback_length,
+      color = I(treatment_colors_dark[treatment_appeal])
     ),
-    linewidth = 0.4
+    width = 0.2,
+    linewidth = 0.7
   ) +
+  geom_point(size = 2.8) +
   scale_color_manual(values = treatment_colors, labels = treatment_names) +
   scale_x_continuous(breaks = sort(unique(text_summary$generation))) +
   scale_y_continuous(

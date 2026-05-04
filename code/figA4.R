@@ -4,32 +4,6 @@ source("code/_helpers.R")
 
 base_theme <- make_base_theme()
 
-# Cache parsed solution vectors so repeated strings are converted only once.
-solution_cache <- new.env(parent = emptyenv())
-
-solution_vector <- function(solution) {
-  if (is.na(solution) || solution == "") {
-    return(rep(NA_integer_, 27))
-  }
-  # Reuse cached vector when this solution string has already been parsed.
-  if (exists(solution, envir = solution_cache, inherits = FALSE)) {
-    return(get(solution, envir = solution_cache, inherits = FALSE))
-  }
-  tokens <- strsplit(solution, "-", fixed = TRUE)[[1]]
-  vec <- as.integer(strsplit(paste(tokens, collapse = ""), "", fixed = TRUE)[[1]])
-  # Store parsed vector in cache for future lookups.
-  assign(solution, vec, envir = solution_cache)
-  vec
-}
-
-mean_pairwise_distance <- function(solutions) {
-  if (length(solutions) < 2) {
-    return(NA_real_)
-  }
-  mat <- do.call(rbind, lapply(solutions, solution_vector))
-  mean(as.numeric(dist(mat, method = "manhattan")))
-}
-
 df_long <- read_csv("data/df_long.csv") %>%
   select(all_of(c(
     "participant_code", "chain_code", "treatment_appeal", "generation", "period",
@@ -84,11 +58,11 @@ FigA4A <- ggplot(
   geom_errorbar(
     aes(
       ymin = within_distance_mean - within_distance_se,
-      ymax = within_distance_mean + within_distance_se
+      ymax = within_distance_mean + within_distance_se,
+      color = I(treatment_colors_dark[treatment_appeal])
     ),
-    width = 0.15,
-    linewidth = 0.4,
-    color = "black"
+    width = 0.2,
+    linewidth = 0.7
   ) +
   scale_color_manual(values = treatment_colors, labels = treatment_names) +
   scale_fill_manual(values = treatment_colors, labels = treatment_names) +
@@ -114,15 +88,17 @@ FigA4B <- ggplot(
     group = treatment_appeal
   )
 ) +
-  geom_point(size = 2.8) +
   geom_line(linewidth = 0.6) +
-  geom_linerange(
+  geom_errorbar(
     aes(
       ymin = within_distance_mean - within_distance_se,
-      ymax = within_distance_mean + within_distance_se
+      ymax = within_distance_mean + within_distance_se,
+      color = I(treatment_colors_dark[treatment_appeal])
     ),
-    linewidth = 0.4
+    width = 0.2,
+    linewidth = 0.7
   ) +
+  geom_point(size = 2.8) +
   scale_color_manual(values = treatment_colors, labels = treatment_names) +
   scale_x_continuous(breaks = sort(unique(individual_exploration_summary$generation))) +
   scale_y_continuous(

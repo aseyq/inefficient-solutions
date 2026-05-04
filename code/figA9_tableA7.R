@@ -7,30 +7,6 @@ source("code/_helpers.R")
 
 base_theme <- make_base_theme()
 
-# Cache parsed solution vectors so repeated strings are converted only once.
-solution_cache <- new.env(parent = emptyenv())
-
-solution_vector <- function(solution) {
-    if (is.na(solution) || solution == "") {
-        return(rep(NA_integer_, 27))
-    }
-    if (exists(solution, envir = solution_cache, inherits = FALSE)) {
-        return(get(solution, envir = solution_cache, inherits = FALSE))
-    }
-    tokens <- strsplit(solution, "-", fixed = TRUE)[[1]]
-    vec <- as.integer(strsplit(paste(tokens, collapse = ""), "", fixed = TRUE)[[1]])
-    assign(solution, vec, envir = solution_cache)
-    vec
-}
-
-mean_pairwise_distance <- function(solutions) {
-    if (length(solutions) < 2) {
-        return(NA_real_)
-    }
-    mat <- do.call(rbind, lapply(solutions, solution_vector))
-    mean(as.numeric(dist(mat, method = "manhattan")))
-}
-
 df_long <- read_csv("data/df_long.csv") %>%
     mutate(
         generation = as.integer(generation),
@@ -39,7 +15,7 @@ df_long <- read_csv("data/df_long.csv") %>%
     ) %>%
     filter(treatment_appeal == "high_appeal")
 
-df_advice <- read_csv("data/df_advice_gpt5.csv", show_col_types = FALSE)
+df_advice <- read_csv("data/df_advice_manual_coding.csv", show_col_types = FALSE)
 
 df_advice_categories <- df_advice %>%
     select(participant_code, mix_and_match:other) %>%
@@ -163,26 +139,26 @@ FigA9 <- (FigA9A + FigA9B) +
     theme(legend.position = "none")
 
 ggsave(
-    "figures/figA9_gpt5.png",
+    "figures/figA9.png",
     FigA9,
     width = 10.2,
     height = 4.6,
     dpi = 300
 )
 
-model_tableA6_mix <- lmer(
+model_tableA7_mix <- lmer(
     within_individual_solution_distance ~ selected_mix_and_match + (1 | chain_code),
     data = participant_metrics,
     REML = FALSE
 )
 
-model_tableA6_mix_additive <- lmer(
+model_tableA7_mix_additive <- lmer(
     within_individual_solution_distance ~ selected_mix_and_match + generation + (1 | chain_code),
     data = participant_metrics,
     REML = FALSE
 )
 
-model_tableA6_mix_interaction <- lmer(
+model_tableA7_mix_interaction <- lmer(
     within_individual_solution_distance ~ selected_mix_and_match * generation + (1 | chain_code),
     data = participant_metrics,
     REML = FALSE
@@ -190,15 +166,14 @@ model_tableA6_mix_interaction <- lmer(
 
 print(
     tab_model(
-        model_tableA6_mix,
-        model_tableA6_mix_additive,
-        model_tableA6_mix_interaction,
+        model_tableA7_mix,
+        model_tableA7_mix_additive,
+        model_tableA7_mix_interaction,
         show.ci = FALSE,
         show.se = TRUE,
         show.re.var = FALSE,
         dv.labels = c("Mix & Match", "Mix & Match + generation", "Mix & Match × generation"),
-        title = "Table A6) High-appeal: within-individual distance by selecting Mix & Match advice",
-        file = "figures/table_a6_gpt5.html"
+        title = "Table A7) High-appeal: within-individual distance by selecting Mix & Match advice",
+        file = "figures/table_a7_manual.html"
     )
 )
-message("Error bar on Fig A9 GPT5 comparison gets out of the fixed range. I am keeping it to compare it with the original Fig9 that we put in the paper. Can update range for both before publication.")

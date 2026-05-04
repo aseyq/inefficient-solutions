@@ -4,6 +4,7 @@ library(lmerTest)
 library(sjPlot)
 library(jsonlite)
 library(purrr)
+source("code/_helpers.R")
 
 # get data
 df_long <- read_csv("data/df_long.csv")
@@ -14,38 +15,6 @@ df_long <- df_long %>%
     generation = as.integer(generation),
     treatment_appeal = factor(treatment_appeal, levels = c("high_appeal", "low_appeal"))
   )
-
-`%||%` <- function(a, b) if (is.null(a) || is.na(a)) b else a
-
-count_blues_apps <- function(x) {
-  if (is.null(x) || is.na(x) || x == "") {
-    return(list(n_blues = NA_integer_, n_apps = NA_integer_))
-  }
-
-  grid <- jsonlite::fromJSON(
-    x,
-    simplifyVector = FALSE,
-    simplifyDataFrame = FALSE,
-    simplifyMatrix = FALSE
-  )
-
-  # grid is 3 lists (rows), each containing 3 cells; flatten one level to 9 cells
-  cells <- unlist(grid, recursive = FALSE)
-
-  getv <- function(cell, nm) as.integer(cell[[nm]] %||% 0L)
-
-  b <- sum(vapply(cells, getv, integer(1), nm = "blue"))
-  y <- sum(vapply(cells, getv, integer(1), nm = "yellow"))
-  r <- sum(vapply(cells, getv, integer(1), nm = "red"))
-
-  list(n_blues = b, n_apps = b + y + r)
-}
-
-# If any rows contain malformed JSON, this will return NA instead of erroring
-count_blues_apps_safe <- purrr::possibly(
-  count_blues_apps,
-  otherwise = list(n_blues = NA_integer_, n_apps = NA_integer_)
-)
 
 df_nutrients <- df_long %>%
   select(participant_code, treatment_appeal, generation, chain_code, plants_treated, grid_state) %>%

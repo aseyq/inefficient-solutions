@@ -2,32 +2,9 @@ library(tidyverse)
 library(lme4)
 library(lmerTest)
 library(sjPlot)
+source("code/_helpers.R")
 
 # Table A4 outcomes (participant-level exploration metrics)
-
-# Cache parsed solution vectors so repeated strings are converted only once.
-solution_cache <- new.env(parent = emptyenv())
-
-solution_vector <- function(solution) {
-    if (is.na(solution) || solution == "") {
-        return(rep(NA_integer_, 27))
-    }
-    if (exists(solution, envir = solution_cache, inherits = FALSE)) {
-        return(get(solution, envir = solution_cache, inherits = FALSE))
-    }
-    tokens <- strsplit(solution, "-", fixed = TRUE)[[1]]
-    vec <- as.integer(strsplit(paste(tokens, collapse = ""), "", fixed = TRUE)[[1]])
-    assign(solution, vec, envir = solution_cache)
-    vec
-}
-
-mean_pairwise_distance <- function(solutions) {
-    if (length(solutions) < 2) {
-        return(NA_real_)
-    }
-    mat <- do.call(rbind, lapply(solutions, solution_vector))
-    mean(as.numeric(dist(mat, method = "manhattan")))
-}
 
 df_long <- read_csv("data/df_long.csv") %>%
     select(all_of(c(

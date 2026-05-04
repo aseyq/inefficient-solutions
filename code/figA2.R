@@ -62,15 +62,19 @@ agreement_generation_summary <- agreement_chain %>%
 
 FigA2A <- ggplot(
   agreement_pooled_summary,
-  aes(x = treatment_appeal, y = agreement_mean, fill = treatment_appeal)
+  aes(
+    x = treatment_appeal, y = agreement_mean,
+    fill = treatment_appeal, color = treatment_appeal
+  )
 ) +
   geom_col(width = 0.65, alpha = 0.95) +
   geom_errorbar(
-    aes(ymin = agreement_mean - agreement_se, ymax = agreement_mean + agreement_se),
-    width = 0.15,
-    linewidth = 0.45
+    aes(ymin = agreement_mean - agreement_se, ymax = agreement_mean + agreement_se, color = I(treatment_colors_dark[treatment_appeal])),
+    width = 0.2,
+    linewidth = 0.7
   ) +
   scale_fill_manual(values = treatment_colors, labels = treatment_names) +
+  scale_color_manual(values = treatment_colors, labels = treatment_names, guide = "none") +
   scale_x_discrete(labels = treatment_names) +
   scale_y_continuous(
     limits = c(0, 1),
@@ -94,12 +98,13 @@ FigA2B <- ggplot(
     group = treatment_appeal
   )
 ) +
-  geom_point(size = 2.8) +
   geom_line(linewidth = 0.6) +
-  geom_linerange(
-    aes(ymin = agreement_mean - agreement_se, ymax = agreement_mean + agreement_se),
-    linewidth = 0.4
+  geom_errorbar(
+    aes(ymin = agreement_mean - agreement_se, ymax = agreement_mean + agreement_se, color = I(treatment_colors_dark[treatment_appeal])),
+    width = 0.2,
+    linewidth = 0.7
   ) +
+  geom_point(size = 2.8) +
   scale_color_manual(values = treatment_colors, labels = treatment_names) +
   scale_x_continuous(breaks = sort(unique(agreement_generation_summary$generation))) +
   scale_y_continuous(
