@@ -1,10 +1,15 @@
 library(tidyverse)
 library(grid)
+library(jsonlite)
 source("code/_helpers.R")
 
 df_long <- read_csv("data/df_long.csv", show_col_types = FALSE)
 
-# plants_treated is already a column in df_long — no recomputation needed
+# Compute n_nutrients (sum of all nutrient applications) via parse_grid_safe
+df_long <- df_long %>%
+  mutate(tmp = map(grid_state, parse_grid_safe)) %>%
+  unnest_wider(tmp) %>%
+  mutate(n_nutrients = n_blue + n_yellow + n_red)
 
 # Chain ordering from figA10 (sorted by blue-solution status across generations)
 chain_order <- read_csv("data/processed/chain_order.csv", show_col_types = FALSE)
@@ -23,14 +28,12 @@ y_scale <- df_plot %>%
   summarise(y_mid = mean(y), .groups = "drop") %>%
   mutate(label = paste("Chain", chain_rank))
 
-FigA11 <- df_plot %>%
-  ggplot(aes(x = period_in_chain, y = y, fill = plants_treated)) +
+FigA12 <- df_plot %>%
+  ggplot(aes(x = period_in_chain, y = y, fill = n_nutrients)) +
   geom_tile(color = "white") +
   scale_fill_gradientn(
     colours = c("grey90", "grey60", "#000000"),
-    limits = c(0, 9),
-    breaks = c(0, 3, 6, 9),
-    name = "Number of\nplants treated"
+    name = "Number of\nnutrients used"
   ) +
   facet_wrap(
     ~treatment_appeal,
@@ -67,4 +70,4 @@ FigA11 <- df_plot %>%
     plot.margin = margin(10, 5, 25, 5)
   )
 
-ggsave("figures/figA11.png", plot = FigA11, width = 10, height = 6, dpi = 300)
+ggsave("figures/figA12.png", plot = FigA12, width = 10, height = 6, dpi = 300)
