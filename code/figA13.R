@@ -86,6 +86,17 @@ base_plot <- function(data, fill_var, palette, title, limits = c(0, 1),
       axis.ticks.y = element_blank(),
       axis.title.y = element_text(size = 10),
       plot.margin = margin(10, 5, 25, 5)
+    ) +
+    geom_text(
+      data = data.frame(
+        period_in_chain = c(3.5, 9.5, 15.5, 21.5),
+        label = paste("Generation", 1:4),
+        y = Inf
+      ),
+      aes(x = period_in_chain, y = y, label = label),
+      vjust = 2,
+      size = 2,
+      inherit.aes = FALSE
     )
 }
 
