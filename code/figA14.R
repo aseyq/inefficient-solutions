@@ -13,47 +13,17 @@ df_long <- read_csv("data/df_long.csv") %>%
     chain_code = as.character(chain_code)
   )
 
-chain_order <- df_long %>%
-  distinct(treatment_appeal, chain_code) %>%
-  mutate(
-    chain_facet = paste0(
-      if_else(treatment_appeal == "low_appeal", "Low", "High"),
-      " appeal · Chain ",
-      chain_code
-    )
-  )
+chain_order <- read_csv("data/processed/chain_order.csv", show_col_types = FALSE)
 
 df_chain_scores <- df_long %>%
   filter(period == 6) %>%
   left_join(chain_order, by = c("treatment_appeal", "chain_code")) %>%
-  mutate(chain_facet = as.character(chain_facet))
-
-chain_slopes <- df_chain_scores %>%
-  group_by(treatment_appeal, chain_code, chain_facet) %>%
-  summarise(
-    slope = coef(lm(net_payoff ~ generation))[2],
-    .groups = "drop"
-  ) %>%
-  arrange(treatment_appeal, desc(slope), chain_code) %>%
   mutate(
-    chain_no = row_number(),
-    chain_label = paste0("Chain ", chain_no)
-  )
-
-chain_label_map <- setNames(chain_slopes$chain_label, chain_slopes$chain_facet)
-chain_no_labeller <- as_labeller(chain_label_map)
-
-df_chain_scores <- df_chain_scores %>%
-  left_join(
-    chain_slopes %>% select(treatment_appeal, chain_code, chain_no, chain_label),
-    by = c("treatment_appeal", "chain_code")
-  ) %>%
-  mutate(
-    chain_facet = factor(chain_facet, levels = chain_slopes$chain_facet)
+    chain_label = factor(paste("Chain", chain_rank), levels = paste("Chain", 1:20))
   )
 
 chain_generation_average <- df_chain_scores %>%
-  group_by(treatment_appeal, chain_facet, generation) %>%
+  group_by(treatment_appeal, chain_label, generation) %>%
   summarise(mean_score = mean(net_payoff, na.rm = TRUE), .groups = "drop")
 
 plot_score_treatment <- function(treatment_value) {
@@ -73,16 +43,15 @@ plot_score_treatment <- function(treatment_value) {
     ) +
     geom_line(
       data = avg_t,
-      aes(x = generation, y = mean_score, group = chain_facet),
+      aes(x = generation, y = mean_score, group = chain_label),
       inherit.aes = FALSE,
       color = "#2E7D32",
       linewidth = 1.0,
       alpha = 0.95
     ) +
     facet_wrap(
-      ~chain_facet,
-      ncol = 10,
-      labeller = chain_no_labeller
+      ~chain_label,
+      ncol = 10
     ) +
     scale_color_manual(
       values = treatment_colors,
@@ -119,19 +88,12 @@ FigA14a <- (plot_score_treatment("low_appeal") / plot_score_treatment("high_appe
 df_chain_cost <- df_long %>%
   filter(period == 6) %>%
   left_join(chain_order, by = c("treatment_appeal", "chain_code")) %>%
-  mutate(chain_facet = as.character(chain_facet))
-
-df_chain_cost <- df_chain_cost %>%
-  left_join(
-    chain_slopes %>% select(treatment_appeal, chain_code, chain_no, chain_label),
-    by = c("treatment_appeal", "chain_code")
-  ) %>%
   mutate(
-    chain_facet = factor(chain_facet, levels = chain_slopes$chain_facet)
+    chain_label = factor(paste("Chain", chain_rank), levels = paste("Chain", 1:20))
   )
 
 chain_generation_average_cost <- df_chain_cost %>%
-  group_by(treatment_appeal, chain_facet, generation) %>%
+  group_by(treatment_appeal, chain_label, generation) %>%
   summarise(mean_cost = mean(cost, na.rm = TRUE), .groups = "drop")
 
 plot_cost_treatment <- function(treatment_value) {
@@ -151,16 +113,15 @@ plot_cost_treatment <- function(treatment_value) {
     ) +
     geom_line(
       data = avg_t,
-      aes(x = generation, y = mean_cost, group = chain_facet),
+      aes(x = generation, y = mean_cost, group = chain_label),
       inherit.aes = FALSE,
       color = "#C62828",
       linewidth = 1.0,
       alpha = 0.95
     ) +
     facet_wrap(
-      ~chain_facet,
-      ncol = 10,
-      labeller = chain_no_labeller
+      ~chain_label,
+      ncol = 10
     ) +
     scale_color_manual(
       values = treatment_colors,
