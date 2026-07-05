@@ -1,0 +1,39 @@
+{
+  "title": "Replication package for \"Cognitive appeal promotes the persistence of inefficient solutions and hinders cumulative cultural evolution\"",
+  "description": "Data and analysis code for the transmission-chain experiment reported in Saral, Singh, Jacquet, Jang & Derex, \"Cognitive appeal promotes the persistence of inefficient solutions and hinders cumulative cultural evolution.\" The package contains the raw and processed experimental data, the R analysis scripts that reproduce all figures and tables in the manuscript and supplementary information, and the optional scripts used for the textual/semantic analyses of participants' written advice.",
+  "upload_type": "dataset",
+  "license": "MIT",
+  "access_right": "open",
+  "creators": [
+    {
+      "name": "Saral, Ali Seyhun",
+      "affiliation": "Institute for Advanced Study in Toulouse"
+    },
+    {
+      "name": "Singh, Manvir",
+      "affiliation": "University of California, Davis"
+    },
+    {
+      "name": "Jacquet, Antoine",
+      "affiliation": "Sciences Po, Paris"
+    },
+    {
+      "name": "Jang, Haneul",
+      "affiliation": "Institute for Advanced Study in Toulouse"
+    },
+    {
+      "name": "Derex, Maxime",
+      "affiliation": "Toulouse School of Economics, CNRS, University of Toulouse Capitole; Institute for Advanced Study in Toulouse"
+    }
+  ],
+  "keywords": [
+    "cumulative cultural evolution",
+    "social learning",
+    "cultural transmission",
+    "cognitive bias",
+    "content bias",
+    "transmission-chain experiment",
+    "law of similarity",
+    "ineffective practices"
+  ]
+}
