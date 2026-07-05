@@ -1,6 +1,6 @@
-# The Emergence and Cultural Persistence of Ineffective Solutions
+# Cognitive appeal promotes the persistence of inefficient solutions and hinders cumulative cultural evolution
 
-This repository contains the code and data necessary to reproduce analyses and figures in the paper _"The Emergence and Cultural Persistence of Ineffective Solutions."_ (Saral, Singh, Jacquet, Jang & Derex, 202X). 
+This repository contains the code and data necessary to reproduce analyses and figures in the paper _"Cognitive appeal promotes the persistence of inefficient solutions and hinders cumulative cultural evolution." (Saral, Singh, Jacquet, Jang & Derex). 
 
 ## Repository Structure
 | Path | Description |
