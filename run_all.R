@@ -1,4 +1,4 @@
-# Clear figures output and run all analysis scripts in code/
+# Clear output files and run all analysis scripts in code/
 
 timestamp <- function() format(Sys.time(), "%Y-%m-%d %H:%M:%S")
 log_step <- function(...) message(sprintf("[%s]", timestamp()), " ", ...)
@@ -13,20 +13,20 @@ if (length(file_arg) > 0) {
 log_step("Starting run_all.R")
 log_step("Working directory: ", getwd())
 
-figures_dir <- "figures"
+outputs_dir <- "output"
 code_dir <- "code"
 
 # Silence readr's column specification chatter across sourced scripts.
 options(readr.show_col_types = FALSE)
 log_step("Set option readr.show_col_types = FALSE")
 
-if (!dir.exists(figures_dir)) {
-  dir.create(figures_dir, recursive = TRUE)
-  log_step("Created missing directory: ", figures_dir)
+if (!dir.exists(outputs_dir)) {
+  dir.create(outputs_dir, recursive = TRUE)
+  log_step("Created missing directory: ", outputs_dir)
 }
 
 figure_contents <- list.files(
-  figures_dir,
+  outputs_dir,
   full.names = TRUE,
   recursive = TRUE,
   all.files = TRUE,
@@ -34,14 +34,15 @@ figure_contents <- list.files(
 )
 
 if (length(figure_contents) > 0) {
-  log_step("Deleting ", length(figure_contents), " existing item(s) from ", figures_dir)
+  log_step("Deleting ", length(figure_contents), " existing item(s) from ", outputs_dir)
   unlink(figure_contents, recursive = TRUE, force = TRUE)
 } else {
-  log_step("No existing files to delete in ", figures_dir)
+  log_step("No existing files to delete in ", outputs_dir)
 }
 
 scripts <- list.files(code_dir, pattern = "\\.[Rr]$", full.names = TRUE, recursive = FALSE)
 scripts <- scripts[!grepl("^_", basename(scripts))]
+scripts <- scripts[!grepl("^zzz", basename(scripts), ignore.case = TRUE)]
 scripts <- sort(scripts)
 
 if (length(scripts) == 0) {

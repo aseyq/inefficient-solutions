@@ -1,0 +1,9 @@
+Model,Term,Estimate (b),SE,95% CI,df,t,p
+Within-individual distance: additive,(Intercept),9.78,0.90,"[8.02, 11.55]",92.40,10.86,<0.001
+Within-individual distance: additive,selected_mix_and_match,-1.54,0.95,"[-3.41, 0.33]",100.48,-1.61,0.110
+Within-individual distance: additive,generation_c2,-1.50,0.57,"[-2.62, -0.37]",159.72,-2.62,0.010
+,,,,,,,
+Within-individual distance: interaction,(Intercept),10.10,1.07,"[8.01, 12.20]",117.60,9.45,<0.001
+Within-individual distance: interaction,selected_mix_and_match,-2.18,1.50,"[-5.11, 0.76]",156.60,-1.46,0.148
+Within-individual distance: interaction,generation_c2,-1.81,0.80,"[-3.38, -0.25]",178.88,-2.27,0.024
+Within-individual distance: interaction,selected_mix_and_match:generation_c2,0.66,1.16,"[-1.61, 2.92]",171.56,0.57,0.570

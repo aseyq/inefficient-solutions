@@ -1,0 +1,18 @@
+Model,Term,Estimate (b),SE,95% CI,df,t,p
+Within-chain distance: additive,(Intercept),14.28,0.93,"[12.46, 16.10]",96.82,15.40,<0.001
+Within-chain distance: additive,generation_c,-1.20,0.39,"[-1.97, -0.44]",120.00,-3.08,0.003
+Within-chain distance: additive,treatment_appeallow_appeal,4.07,1.02,"[2.08, 6.06]",40.00,4.01,<0.001
+,,,,,,,
+Within-chain distance: interaction,(Intercept),13.89,1.10,"[11.74, 16.04]",136.59,12.68,<0.001
+Within-chain distance: interaction,generation_c,-0.94,0.55,"[-2.03, 0.14]",120.00,-1.71,0.090
+Within-chain distance: interaction,treatment_appeallow_appeal,4.85,1.55,"[1.81, 7.88]",136.59,3.13,0.002
+Within-chain distance: interaction,generation_c:treatment_appeallow_appeal,-0.52,0.78,"[-2.05, 1.01]",120.00,-0.67,0.507
+,,,,,,,
+Between-chains distance: additive,(Intercept),13.96,0.45,"[13.08, 14.85]",88.79,30.82,<0.001
+Between-chains distance: additive,generation_c,-0.31,0.18,"[-0.67, 0.04]",120.00,-1.72,0.088
+Between-chains distance: additive,treatment_appeallow_appeal,4.47,0.51,"[3.47, 5.47]",40.00,8.74,<0.001
+,,,,,,,
+Between-chains distance: interaction,(Intercept),13.84,0.53,"[12.80, 14.88]",127.50,26.18,<0.001
+Between-chains distance: interaction,generation_c,-0.23,0.26,"[-0.73, 0.27]",120.00,-0.90,0.372
+Between-chains distance: interaction,treatment_appeallow_appeal,4.72,0.75,"[3.25, 6.18]",127.50,6.31,<0.001
+Between-chains distance: interaction,generation_c:treatment_appeallow_appeal,-0.16,0.36,"[-0.88, 0.55]",120.00,-0.45,0.651

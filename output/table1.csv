@@ -1,0 +1,22 @@
+Model,Term,Estimate (b),SE,95% CI,df,t,p
+A. Scores: low appeal,(Intercept),660.39,9.71,"[641.37, 679.42]",97.32,68.04,<0.001
+A. Scores: low appeal,generation_c,17.23,4.94,"[7.55, 26.90]",220.00,3.49,<0.001
+,,,,,,,
+A. Scores: high appeal,(Intercept),665.87,9.42,"[647.40, 684.34]",101.47,70.68,<0.001
+A. Scores: high appeal,generation_c,2.72,4.84,"[-6.77, 12.21]",220.00,0.56,0.575
+,,,,,,,
+A. Scores: interaction,(Intercept),665.87,9.56,"[647.12, 684.62]",198.61,69.62,<0.001
+A. Scores: interaction,treatment_appeallow_appeal,-5.48,13.53,"[-31.99, 21.03]",198.61,-0.40,0.686
+A. Scores: interaction,generation_c,2.72,4.89,"[-6.86, 12.30]",440.00,0.56,0.578
+A. Scores: interaction,treatment_appeallow_appeal:generation_c,14.51,6.91,"[0.96, 28.06]",440.00,2.10,0.036
+,,,,,,,
+B. Cost: low appeal,(Intercept),86.67,4.40,"[78.04, 95.31]",36.11,19.68,<0.001
+B. Cost: low appeal,generation_c,-5.49,1.50,"[-8.43, -2.56]",220.00,-3.67,<0.001
+,,,,,,,
+B. Cost: high appeal,(Intercept),92.40,2.11,"[88.26, 96.53]",114.70,43.80,<0.001
+B. Cost: high appeal,generation_c,1.55,1.11,"[-0.64, 3.73]",220.00,1.39,0.167
+,,,,,,,
+B. Cost: interaction,(Intercept),92.40,3.45,"[85.63, 99.17]",86.84,26.76,<0.001
+B. Cost: interaction,treatment_appeallow_appeal,-5.72,4.88,"[-15.30, 3.85]",86.84,-1.17,0.244
+B. Cost: interaction,generation_c,1.55,1.32,"[-1.04, 4.13]",440.00,1.17,0.242
+B. Cost: interaction,treatment_appeallow_appeal:generation_c,-7.04,1.87,"[-10.70, -3.38]",440.00,-3.77,<0.001

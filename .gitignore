@@ -1,15 +1,8 @@
 ## Data from other experiment added for comparison.
-data/df_long_nopay.csv
-figA15.R
-figA16.R
-tableA8.R
-Revision 2/
-
-Manuscript_Revised_new.odt
-temp_count_unique.R
-
+ignore/
 *.txt
 zzz_temp*
+code/zzz*
 Rplots.pdf
 .vscode/
 # Byte-compiled / optimized / DLL files
@@ -223,6 +216,7 @@ marimo/_static/
 marimo/_lsp/
 __marimo__/
 .DS_Store
-figures/~$stance_measure.docx
-figures/distance_measure.docx
-manuscript.pdf
+
+# Ai agents
+.claude/
+.copilot/

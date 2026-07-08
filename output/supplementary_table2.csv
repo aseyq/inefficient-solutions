@@ -1,0 +1,27 @@
+Model,Term,Estimate (b),SE,95% CI,df,t,p
+A. Copy probability: additive,(Intercept),0.19,0.04,"[0.11, 0.27]",78.93,4.56,<0.001
+A. Copy probability: additive,treatment_appeallow_appeal,-0.04,0.05,"[-0.14, 0.06]",40.00,-0.78,0.441
+A. Copy probability: additive,generation_c2,-0.01,0.02,"[-0.05, 0.04]",320.00,-0.36,0.716
+,,,,,,,
+A. Copy probability: interaction,(Intercept),0.20,0.05,"[0.11, 0.29]",124.43,4.18,<0.001
+A. Copy probability: interaction,treatment_appeallow_appeal,-0.06,0.07,"[-0.19, 0.08]",124.43,-0.82,0.414
+A. Copy probability: interaction,generation_c2,-0.02,0.03,"[-0.08, 0.05]",320.00,-0.52,0.607
+A. Copy probability: interaction,treatment_appeallow_appeal:generation_c2,0.02,0.05,"[-0.07, 0.11]",320.00,0.36,0.716
+,,,,,,,
+B. Distance first trial: additive,(Intercept),7.93,0.93,"[6.12, 9.74]",70.61,8.57,<0.001
+B. Distance first trial: additive,treatment_appeallow_appeal,2.26,1.13,"[0.04, 4.48]",40.00,2.00,0.052
+B. Distance first trial: additive,generation_c2,-0.26,0.47,"[-1.17, 0.65]",320.00,-0.56,0.579
+,,,,,,,
+B. Distance first trial: interaction,(Intercept),7.21,1.03,"[5.18, 9.23]",105.75,6.97,<0.001
+B. Distance first trial: interaction,treatment_appeallow_appeal,3.71,1.46,"[0.85, 6.58]",105.75,2.54,0.013
+B. Distance first trial: interaction,generation_c2,0.47,0.66,"[-0.82, 1.75]",320.00,0.71,0.477
+B. Distance first trial: interaction,treatment_appeallow_appeal:generation_c2,-1.45,0.93,"[-3.27, 0.37]",320.00,-1.57,0.119
+,,,,,,,
+C. Distance transmitted: additive,(Intercept),10.74,1.04,"[8.71, 12.77]",64.50,10.38,<0.001
+C. Distance transmitted: additive,treatment_appeallow_appeal,3.49,1.30,"[0.95, 6.03]",40.00,2.69,0.010
+C. Distance transmitted: additive,generation_c2,-0.71,0.48,"[-1.66, 0.23]",320.00,-1.48,0.140
+,,,,,,,
+C. Distance transmitted: interaction,(Intercept),10.90,1.14,"[8.67, 13.14]",92.76,9.55,<0.001
+C. Distance transmitted: interaction,treatment_appeallow_appeal,3.16,1.61,"[-0.00, 6.33]",92.76,1.96,0.053
+C. Distance transmitted: interaction,generation_c2,-0.87,0.68,"[-2.21, 0.46]",320.00,-1.29,0.199
+C. Distance transmitted: interaction,treatment_appeallow_appeal:generation_c2,0.32,0.96,"[-1.56, 2.21]",320.00,0.34,0.736
